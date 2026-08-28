@@ -56,21 +56,26 @@ public class RestaurantService {
 
 
     @CacheEvict(cacheNames = "restaurants", allEntries = true)
-    public RestaurantEntity createRestaurant(RestaurantRequestBody body) {
+    public RestaurantDto createRestaurant(RestaurantRequestBody body) {
         RestaurantEntity restaurant = new RestaurantEntity(
                 null, body.name(), body.address(), body.phone(), body.imageUrl());
-        return restaurantRepository.save(restaurant);
+        RestaurantEntity saved = restaurantRepository.save(restaurant);
+        return new RestaurantDto(saved, List.of());
     }
 
 
     @CacheEvict(cacheNames = "restaurants", allEntries = true)
-    public RestaurantEntity updateRestaurant(long restaurantId, RestaurantRequestBody body) {
+    public RestaurantDto updateRestaurant(long restaurantId, RestaurantRequestBody body) {
         if (!restaurantRepository.existsById(restaurantId)) {
             throw new ResourceNotFoundException("Restaurant " + restaurantId + " not found");
         }
         RestaurantEntity restaurant = new RestaurantEntity(
                 restaurantId, body.name(), body.address(), body.phone(), body.imageUrl());
-        return restaurantRepository.save(restaurant);
+        RestaurantEntity saved = restaurantRepository.save(restaurant);
+        List<MenuItemDto> menuItems = menuItemRepository.getByRestaurantId(restaurantId).stream()
+                .map(MenuItemDto::new)
+                .toList();
+        return new RestaurantDto(saved, menuItems);
     }
 
 

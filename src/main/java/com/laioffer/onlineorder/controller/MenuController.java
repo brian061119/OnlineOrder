@@ -2,7 +2,6 @@ package com.laioffer.onlineorder.controller;
 
 
 import com.laioffer.onlineorder.entity.MenuItemEntity;
-import com.laioffer.onlineorder.entity.RestaurantEntity;
 import com.laioffer.onlineorder.model.MenuItemRequestBody;
 import com.laioffer.onlineorder.model.RestaurantDto;
 import com.laioffer.onlineorder.model.RestaurantRequestBody;
@@ -50,13 +49,13 @@ public class MenuController {
 
     @PostMapping("/restaurants")
     @ResponseStatus(HttpStatus.CREATED)
-    public RestaurantEntity createRestaurant(@RequestBody RestaurantRequestBody body) {
+    public RestaurantDto createRestaurant(@RequestBody RestaurantRequestBody body) {
         return restaurantService.createRestaurant(body);
     }
 
 
     @PutMapping("/restaurant/{restaurantId}")
-    public RestaurantEntity updateRestaurant(
+    public RestaurantDto updateRestaurant(
             @PathVariable("restaurantId") long restaurantId, @RequestBody RestaurantRequestBody body) {
         return restaurantService.updateRestaurant(restaurantId, body);
     }
