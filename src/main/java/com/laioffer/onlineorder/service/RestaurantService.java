@@ -3,10 +3,13 @@ package com.laioffer.onlineorder.service;
 
 import com.laioffer.onlineorder.entity.MenuItemEntity;
 import com.laioffer.onlineorder.entity.RestaurantEntity;
+import com.laioffer.onlineorder.exception.ResourceNotFoundException;
 import com.laioffer.onlineorder.model.MenuItemDto;
 import com.laioffer.onlineorder.model.RestaurantDto;
+import com.laioffer.onlineorder.model.RestaurantRequestBody;
 import com.laioffer.onlineorder.repository.MenuItemRepository;
 import com.laioffer.onlineorder.repository.RestaurantRepository;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -49,5 +52,33 @@ public class RestaurantService {
             results.add(restaurantDto);
         }
         return results;
+    }
+
+
+    @CacheEvict(cacheNames = "restaurants", allEntries = true)
+    public RestaurantEntity createRestaurant(RestaurantRequestBody body) {
+        RestaurantEntity restaurant = new RestaurantEntity(
+                null, body.name(), body.address(), body.phone(), body.imageUrl());
+        return restaurantRepository.save(restaurant);
+    }
+
+
+    @CacheEvict(cacheNames = "restaurants", allEntries = true)
+    public RestaurantEntity updateRestaurant(long restaurantId, RestaurantRequestBody body) {
+        if (!restaurantRepository.existsById(restaurantId)) {
+            throw new ResourceNotFoundException("Restaurant " + restaurantId + " not found");
+        }
+        RestaurantEntity restaurant = new RestaurantEntity(
+                restaurantId, body.name(), body.address(), body.phone(), body.imageUrl());
+        return restaurantRepository.save(restaurant);
+    }
+
+
+    @CacheEvict(cacheNames = "restaurants", allEntries = true)
+    public void deleteRestaurant(long restaurantId) {
+        if (!restaurantRepository.existsById(restaurantId)) {
+            throw new ResourceNotFoundException("Restaurant " + restaurantId + " not found");
+        }
+        restaurantRepository.deleteById(restaurantId);
     }
 }

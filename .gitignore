@@ -35,3 +35,16 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Node ###
+node_modules/
+
+### macOS ###
+.DS_Store
+
+### Claude Code (local machine settings) ###
+.claude/settings.local.json
+
+### Local scratch / one-off scripts ###
+bench_concurrent.sh
+test.js

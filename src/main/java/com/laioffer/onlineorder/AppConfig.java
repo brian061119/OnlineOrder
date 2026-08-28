@@ -36,6 +36,9 @@ public class AppConfig {
                                 .requestMatchers("/error").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/login", "/logout", "/signup").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/restaurants/**", "/restaurant/**").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/restaurants", "/restaurant/*/menu").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.PUT, "/restaurant/**", "/menu/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.DELETE, "/restaurant/**", "/menu/**").hasRole("ADMIN")
                                 .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception
