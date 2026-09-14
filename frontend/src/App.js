@@ -1,15 +1,26 @@
-import { Layout, Typography } from "antd";
+import { Layout, Tabs, Typography } from "antd";
 import { useState } from "react";
+import AdminPanel from "./components/AdminPanel";
 import FoodList from "./components/FoodList";
 import LoginForm from "./components/LoginForm";
 import MyCart from "./components/MyCart";
 import SignupForm from "./components/SignupForm";
+import { getCurrentUser } from "./utils";
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
+const { TabPane } = Tabs;
 
 function App() {
   const [authed, setAuthed] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  const onLoginSuccess = () => {
+    setAuthed(true);
+    getCurrentUser()
+      .then((user) => setIsAdmin(user.is_admin))
+      .catch(() => setIsAdmin(false));
+  };
 
   return (
     <Layout style={{ height: "100vh" }}>
@@ -22,7 +33,7 @@ function App() {
             level={2}
             style={{ color: "white", lineHeight: "inherit", marginBottom: 0 }}
           >
-            Lai Food
+            MyFood
           </Title>
           <div>{authed ? <MyCart /> : <SignupForm />}</div>
         </div>
@@ -35,9 +46,20 @@ function App() {
         }}
       >
         {authed ? (
-          <FoodList />
+          isAdmin ? (
+            <Tabs defaultActiveKey="order">
+              <TabPane tab="Order" key="order">
+                <FoodList />
+              </TabPane>
+              <TabPane tab="Admin" key="admin">
+                <AdminPanel />
+              </TabPane>
+            </Tabs>
+          ) : (
+            <FoodList />
+          )
         ) : (
-          <LoginForm onSuccess={() => setAuthed(true)} />
+          <LoginForm onSuccess={onLoginSuccess} />
         )}
       </Content>
     </Layout>

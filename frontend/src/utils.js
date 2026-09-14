@@ -60,6 +60,100 @@ return response.json();
 });
 };
 
+export const getCurrentUser = () => {
+return fetch("/me").then((response) => {
+if (response.status < 200 || response.status >= 300) {
+throw Error("Fail to get current user");
+}
+
+return response.json();
+});
+};
+
+export const createRestaurant = (data) => {
+return fetch("/restaurants", {
+method: "POST",
+headers: {
+"Content-Type": "application/json",
+},
+body: JSON.stringify(data),
+}).then((response) => {
+if (response.status < 200 || response.status >= 300) {
+throw Error("Fail to create restaurant");
+}
+
+return response.json();
+});
+};
+
+export const updateRestaurant = (restaurantId, data) => {
+return fetch(`/restaurant/${restaurantId}`, {
+method: "PUT",
+headers: {
+"Content-Type": "application/json",
+},
+body: JSON.stringify(data),
+}).then((response) => {
+if (response.status < 200 || response.status >= 300) {
+throw Error("Fail to update restaurant");
+}
+
+return response.json();
+});
+};
+
+export const deleteRestaurant = (restaurantId) => {
+return fetch(`/restaurant/${restaurantId}`, {
+method: "DELETE",
+}).then((response) => {
+if (response.status < 200 || response.status >= 300) {
+throw Error("Fail to delete restaurant");
+}
+});
+};
+
+export const createMenuItem = (restaurantId, data) => {
+return fetch(`/restaurant/${restaurantId}/menu`, {
+method: "POST",
+headers: {
+"Content-Type": "application/json",
+},
+body: JSON.stringify(data),
+}).then((response) => {
+if (response.status < 200 || response.status >= 300) {
+throw Error("Fail to create menu item");
+}
+
+return response.json();
+});
+};
+
+export const updateMenuItem = (menuItemId, data) => {
+return fetch(`/menu/${menuItemId}`, {
+method: "PUT",
+headers: {
+"Content-Type": "application/json",
+},
+body: JSON.stringify(data),
+}).then((response) => {
+if (response.status < 200 || response.status >= 300) {
+throw Error("Fail to update menu item");
+}
+
+return response.json();
+});
+};
+
+export const deleteMenuItem = (menuItemId) => {
+return fetch(`/menu/${menuItemId}`, {
+method: "DELETE",
+}).then((response) => {
+if (response.status < 200 || response.status >= 300) {
+throw Error("Fail to delete menu item");
+}
+});
+};
+
 export const getCart = () => {
 return fetch("/cart").then((response) => {
 if (response.status < 200 || response.status >= 300) {
