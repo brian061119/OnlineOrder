@@ -41,7 +41,7 @@ public class CartService {
 
     @CacheEvict(cacheNames = "cart", key = "#customerId")
     @Transactional
-    public void addMenuItemToCart(long customerId, long menuItemId) {
+    public void addMenuItemToCart(long customerId, long menuItemId, int addedQuantity) {
         CartEntity cart = cartRepository.getByCustomerId(customerId);
         MenuItemEntity menuItem = menuItemRepository.findById(menuItemId)
                 .orElseThrow(() -> new ResourceNotFoundException("Menu item " + menuItemId + " not found"));
@@ -54,14 +54,14 @@ public class CartService {
 
         if (orderItem == null) {
             orderItemId = null;
-            quantity = 1;
+            quantity = addedQuantity;
         } else {
             orderItemId = orderItem.id();
-            quantity = orderItem.quantity() + 1;
+            quantity = orderItem.quantity() + addedQuantity;
         }
         OrderItemEntity newOrderItem = new OrderItemEntity(orderItemId, menuItemId, cart.id(), menuItem.price(), quantity);
         orderItemRepository.save(newOrderItem);
-        cartRepository.updateTotalPrice(cart.id(), cart.totalPrice() + menuItem.price());
+        cartRepository.updateTotalPrice(cart.id(), cart.totalPrice() + menuItem.price() * addedQuantity);
     }
 
 

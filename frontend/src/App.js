@@ -6,6 +6,7 @@ import LoginForm from "./components/LoginForm";
 import MyCart from "./components/MyCart";
 import SignupForm from "./components/SignupForm";
 import { getCurrentUser } from "./utils";
+import "./theme.css";
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
@@ -23,8 +24,8 @@ function App() {
   };
 
   return (
-    <Layout style={{ height: "100vh" }}>
-      <Header>
+    <Layout className="app-shell" style={{ height: "100vh" }}>
+      <Header className="app-header">
         <div
           className="header"
           style={{ display: "flex", justifyContent: "space-between" }}
@@ -39,6 +40,7 @@ function App() {
         </div>
       </Header>
       <Content
+        className="app-content"
         style={{
           padding: "50px",
           maxHeight: "calc(100% - 64px)",

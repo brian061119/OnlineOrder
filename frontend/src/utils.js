@@ -177,9 +177,10 @@ throw Error("Fail to checkout");
 });
 };
 
-export const addItemToCart = (itemId) => {
+export const addItemToCart = (itemId, quantity) => {
 const payload = {
 menu_id: itemId,
+quantity,
 };
 
 return fetch(`/cart`, {

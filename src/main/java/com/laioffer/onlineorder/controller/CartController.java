@@ -47,7 +47,7 @@ public class CartController {
     @PostMapping("/cart")
     public void addToCart(@AuthenticationPrincipal User user, @RequestBody AddToCartBody body) {
         CustomerEntity customer = customerService.getCustomerByEmail(user.getUsername());
-        cartService.addMenuItemToCart(customer.id(), body.menuId());
+        cartService.addMenuItemToCart(customer.id(), body.menuId(), body.quantity());
     }
 
 
