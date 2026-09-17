@@ -1,7 +1,8 @@
 import { Button, Drawer, List, message, Typography } from "antd";
 import { DeleteOutlined, MinusOutlined, PlusOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
-import { checkout, getCart, removeCartItem, updateCartItem } from "../utils";
+import { getCart, removeCartItem, updateCartItem } from "../utils";
+import CheckoutModal from "./CheckoutModal";
 
 const { Text } = Typography;
 
@@ -9,7 +10,7 @@ const MyCart = () => {
   const [cartVisible, setCartVisible] = useState(false);
   const [cartData, setCartData] = useState();
   const [loading, setLoading] = useState(false);
-  const [checking, setChecking] = useState(false);
+  const [checkoutModalOpen, setCheckoutModalOpen] = useState(false);
   // 正在请求中的那一条的 id，用来只禁用那一行的按钮，而不是整个抽屉
   const [busyItemId, setBusyItemId] = useState(null);
 
@@ -63,18 +64,12 @@ const MyCart = () => {
   };
 
   const onCheckOut = () => {
-    setChecking(true);
-    checkout()
-      .then(() => {
-        message.success("Successfully checkout");
-        setCartVisible(false);
-      })
-      .catch((err) => {
-        message.error(err.message);
-      })
-      .finally(() => {
-        setChecking(false);
-      });
+    setCheckoutModalOpen(true);
+  };
+
+  const onCheckoutSuccess = () => {
+    setCheckoutModalOpen(false);
+    setCartVisible(false);
   };
 
   const onCloseDrawer = () => {
@@ -112,7 +107,6 @@ const MyCart = () => {
               <Button
                 onClick={onCheckOut}
                 type="primary"
-                loading={checking}
                 disabled={loading || cartData?.order_items.length === 0}
               >
                 Checkout
@@ -172,6 +166,12 @@ const MyCart = () => {
           }}
         />
       </Drawer>
+      <CheckoutModal
+        open={checkoutModalOpen}
+        total={cartData?.total_price}
+        onClose={() => setCheckoutModalOpen(false)}
+        onSuccess={onCheckoutSuccess}
+      />
     </>
   );
 };

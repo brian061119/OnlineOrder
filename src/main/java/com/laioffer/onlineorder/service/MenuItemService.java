@@ -19,11 +19,17 @@ public class MenuItemService {
 
     private final MenuItemRepository menuItemRepository;
     private final RestaurantRepository restaurantRepository;
+    private final MenuItemEmbeddingService menuItemEmbeddingService;
 
 
-    public MenuItemService(MenuItemRepository menuItemRepository, RestaurantRepository restaurantRepository) {
+    public MenuItemService(
+            MenuItemRepository menuItemRepository,
+            RestaurantRepository restaurantRepository,
+            MenuItemEmbeddingService menuItemEmbeddingService
+    ) {
         this.menuItemRepository = menuItemRepository;
         this.restaurantRepository = restaurantRepository;
+        this.menuItemEmbeddingService = menuItemEmbeddingService;
     }
 
 
@@ -44,7 +50,9 @@ public class MenuItemService {
         }
         MenuItemEntity menuItem = new MenuItemEntity(
                 null, restaurantId, body.name(), body.description(), body.price(), body.imageUrl());
-        return menuItemRepository.save(menuItem);
+        MenuItemEntity saved = menuItemRepository.save(menuItem);
+        menuItemEmbeddingService.computeAndStore(saved);
+        return saved;
     }
 
 
@@ -54,7 +62,9 @@ public class MenuItemService {
                 .orElseThrow(() -> new ResourceNotFoundException("Menu item " + menuItemId + " not found"));
         MenuItemEntity menuItem = new MenuItemEntity(
                 menuItemId, existing.restaurantId(), body.name(), body.description(), body.price(), body.imageUrl());
-        return menuItemRepository.save(menuItem);
+        MenuItemEntity saved = menuItemRepository.save(menuItem);
+        menuItemEmbeddingService.computeAndStore(saved);
+        return saved;
     }
 
 

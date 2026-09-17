@@ -1,0 +1,7 @@
+.git
+build
+frontend/node_modules
+frontend/build
+.playwright-cli
+frontend/.playwright-cli
+*.log

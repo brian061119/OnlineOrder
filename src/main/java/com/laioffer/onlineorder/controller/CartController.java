@@ -6,9 +6,12 @@ package com.laioffer.onlineorder.controller;
 import com.laioffer.onlineorder.entity.CustomerEntity;
 import com.laioffer.onlineorder.model.AddToCartBody;
 import com.laioffer.onlineorder.model.CartDto;
+import com.laioffer.onlineorder.model.CheckoutBody;
+import com.laioffer.onlineorder.model.OrderDto;
 import com.laioffer.onlineorder.model.UpdateCartItemBody;
 import com.laioffer.onlineorder.service.CartService;
 import com.laioffer.onlineorder.service.CustomerService;
+import com.laioffer.onlineorder.service.OrderService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,14 +29,17 @@ public class CartController {
 
     private final CartService cartService;
     private final CustomerService customerService;
+    private final OrderService orderService;
 
 
     public CartController(
             CartService cartService,
-            CustomerService customerService
+            CustomerService customerService,
+            OrderService orderService
     ) {
         this.cartService = cartService;
         this.customerService = customerService;
+        this.orderService = orderService;
     }
 
 
@@ -75,8 +81,8 @@ public class CartController {
 
 
     @PostMapping("/cart/checkout")
-    public void checkout(@AuthenticationPrincipal User user) {
+    public OrderDto checkout(@AuthenticationPrincipal User user, @RequestBody CheckoutBody body) {
         CustomerEntity customer = customerService.getCustomerByEmail(user.getUsername());
-        cartService.clearCart(customer.id());
+        return orderService.checkout(customer.id(), body.paymentMethodId());
     }
 }

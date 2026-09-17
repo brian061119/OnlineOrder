@@ -1,6 +1,7 @@
 import { Layout, Tabs, Typography } from "antd";
 import { useState } from "react";
 import AdminPanel from "./components/AdminPanel";
+import AiChatWidget from "./components/AiChatWidget";
 import FoodList from "./components/FoodList";
 import LoginForm from "./components/LoginForm";
 import MyCart from "./components/MyCart";
@@ -64,6 +65,7 @@ function App() {
           <LoginForm onSuccess={onLoginSuccess} />
         )}
       </Content>
+      {authed && <AiChatWidget />}
     </Layout>
   );
 }

@@ -1,3 +1,9 @@
+CREATE EXTENSION IF NOT EXISTS vector;
+
+
+DROP TABLE IF EXISTS order_line_items;
+DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS payment_methods;
 DROP TABLE IF EXISTS order_items;
 DROP TABLE IF EXISTS menu_items;
 DROP TABLE IF EXISTS restaurants;
@@ -26,6 +32,19 @@ CREATE TABLE carts
 );
 
 
+CREATE TABLE payment_methods
+(
+    id           SERIAL PRIMARY KEY NOT NULL,
+    customer_id  INTEGER            NOT NULL,
+    card_holder  TEXT               NOT NULL,
+    brand        TEXT               NOT NULL,
+    last_four    TEXT               NOT NULL,
+    expiry_month INTEGER            NOT NULL,
+    expiry_year  INTEGER            NOT NULL,
+    CONSTRAINT fk_customer FOREIGN KEY (customer_id) REFERENCES customers (id) ON DELETE CASCADE
+);
+
+
 CREATE TABLE restaurants
 (
     id        SERIAL PRIMARY KEY NOT NULL,
@@ -44,7 +63,34 @@ CREATE TABLE menu_items
     price         NUMERIC            NOT NULL,
     description   TEXT,
     image_url     TEXT,
+    embedding     vector(1536),
     CONSTRAINT fk_restaurant FOREIGN KEY (restaurant_id) REFERENCES restaurants (id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE orders
+(
+    id                SERIAL PRIMARY KEY NOT NULL,
+    customer_id       INTEGER            NOT NULL,
+    payment_method_id INTEGER,
+    total_price       NUMERIC            NOT NULL,
+    status            TEXT               NOT NULL,
+    created_at        TIMESTAMP          NOT NULL DEFAULT now(),
+    CONSTRAINT fk_customer FOREIGN KEY (customer_id) REFERENCES customers (id) ON DELETE CASCADE,
+    CONSTRAINT fk_payment_method FOREIGN KEY (payment_method_id) REFERENCES payment_methods (id) ON DELETE SET NULL
+);
+
+
+CREATE TABLE order_line_items
+(
+    id             SERIAL PRIMARY KEY NOT NULL,
+    order_id       INTEGER            NOT NULL,
+    menu_item_id   INTEGER,
+    menu_item_name TEXT               NOT NULL,
+    price          NUMERIC            NOT NULL,
+    quantity       INTEGER            NOT NULL,
+    CONSTRAINT fk_order FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE CASCADE,
+    CONSTRAINT fk_menu_item FOREIGN KEY (menu_item_id) REFERENCES menu_items (id) ON DELETE SET NULL
 );
 
 

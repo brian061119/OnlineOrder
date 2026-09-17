@@ -27,4 +27,11 @@ public class GlobalExceptionHandler {
     public ErrorResponse handleIllegalArgument(IllegalArgumentException ex) {
         return new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
     }
+
+
+    @ExceptionHandler(AiServiceException.class)
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    public ErrorResponse handleAiServiceException(AiServiceException ex) {
+        return new ErrorResponse(HttpStatus.SERVICE_UNAVAILABLE.value(), "AI service is temporarily unavailable");
+    }
 }

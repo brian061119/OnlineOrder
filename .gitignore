@@ -1,5 +1,7 @@
 HELP.md
 .gradle
+/config/
+.playwright-cli/
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/

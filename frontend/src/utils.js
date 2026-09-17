@@ -164,16 +164,45 @@ return response.json();
 });
 };
 
-export const checkout = () => {
+export const getPaymentMethods = () => {
+return fetch("/payment-methods").then((response) => {
+if (response.status < 200 || response.status >= 300) {
+throw Error("Fail to get saved payment methods");
+}
+
+return response.json();
+});
+};
+
+export const addPaymentMethod = (data) => {
+return fetch("/payment-methods", {
+method: "POST",
+headers: {
+"Content-Type": "application/json",
+},
+body: JSON.stringify(data),
+}).then((response) => {
+if (response.status < 200 || response.status >= 300) {
+throw Error("Fail to save payment method");
+}
+
+return response.json();
+});
+};
+
+export const checkout = (paymentMethodId) => {
 return fetch("/cart/checkout", {
 method: "POST",
 headers: {
 "Content-Type": "application/json",
 },
+body: JSON.stringify({ payment_method_id: paymentMethodId }),
 }).then((response) => {
 if (response.status < 200 || response.status >= 300) {
 throw Error("Fail to checkout");
 }
+
+return response.json();
 });
 };
 
@@ -208,6 +237,22 @@ body: JSON.stringify({ quantity }),
 }).then((response) => {
 if (response.status < 200 || response.status >= 300) {
 throw Error("Fail to update the item quantity");
+}
+
+return response.json();
+});
+};
+
+export const getAiRecommendation = (message) => {
+return fetch(`/ai/recommend`, {
+method: "POST",
+headers: {
+"Content-Type": "application/json",
+},
+body: JSON.stringify({ message }),
+}).then((response) => {
+if (response.status < 200 || response.status >= 300) {
+throw Error("Fail to get AI recommendation");
 }
 
 return response.json();
