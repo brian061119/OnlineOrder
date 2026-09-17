@@ -1,0 +1,429 @@
+<title>点餐助手开发日志</title>
+<meta name="color-scheme" content="light dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#eef0f3;
+    --surface:#ffffff;
+    --surface-2:#e6e9ee;
+    --ink:#1a2130;
+    --ink-muted:#616a7a;
+    --line:#d7dbe2;
+    --accent:#2c56c9;
+    --accent-ink:#1c3b91;
+    --accent-2:#0e7d74;
+    --accent-2-bg:#dff0ee;
+    --good:#2f7a4f;
+    --good-bg:#e4f1e7;
+    --bad:#b23b3b;
+    --bad-bg:#f7e6e4;
+    --code-bg:#161a22;
+    --code-ink:#e7e5df;
+    --code-muted:#8891a3;
+    --shadow:0 1px 2px rgba(28,34,48,.04), 0 8px 24px rgba(28,34,48,.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#12151b;
+      --surface:#1a1e26;
+      --surface-2:#20242e;
+      --ink:#e7e8ec;
+      --ink-muted:#949bab;
+      --line:#2c313c;
+      --accent:#7fa0ff;
+      --accent-ink:#c2d2ff;
+      --accent-2:#4fc4b8;
+      --accent-2-bg:#153330;
+      --good:#63c288;
+      --good-bg:#1c3226;
+      --bad:#e18686;
+      --bad-bg:#3a2323;
+      --code-bg:#0d0f14;
+      --code-ink:#d9d7cf;
+      --code-muted:#7d8494;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#12151b;
+    --surface:#1a1e26;
+    --surface-2:#20242e;
+    --ink:#e7e8ec;
+    --ink-muted:#949bab;
+    --line:#2c313c;
+    --accent:#7fa0ff;
+    --accent-ink:#c2d2ff;
+    --accent-2:#4fc4b8;
+    --accent-2-bg:#153330;
+    --good:#63c288;
+    --good-bg:#1c3226;
+    --bad:#e18686;
+    --bad-bg:#3a2323;
+    --code-bg:#0d0f14;
+    --code-ink:#d9d7cf;
+    --code-muted:#7d8494;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+  }
+
+  *{box-sizing:border-box}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    line-height:1.65;
+    padding:0 16px;
+  }
+  .wrap{max-width:760px;margin:0 auto}
+  h1,h2,h3{font-family:"IBM Plex Serif", Georgia, serif; text-wrap:balance; margin:0}
+  .mono{font-family:"IBM Plex Mono", ui-monospace, monospace}
+  a{color:var(--accent)}
+
+  /* ---- top bar ---- */
+  .topbar{
+    position:sticky; top:env(safe-area-inset-top,0px);
+    z-index:20;
+    background:color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+    padding-block:10px;
+    margin:0 -16px 0;
+  }
+  .topbar-inner{
+    max-width:760px;margin:0 auto;padding:0 16px;
+    display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+  }
+  .topbar-title{font-weight:600; font-size:14px; white-space:nowrap}
+  .navpills{display:flex; gap:8px; margin-left:auto; flex-wrap:wrap}
+  .navpills a{
+    font-family:"IBM Plex Mono", monospace; font-size:12px;
+    text-decoration:none; color:var(--ink-muted);
+    border:1px solid var(--line); border-radius:999px;
+    padding:5px 12px; transition:all .15s ease;
+  }
+  .navpills a:hover{color:var(--accent); border-color:var(--accent)}
+
+  /* ---- header ---- */
+  header.hero{padding-block:36px 20px}
+  .eyebrow{
+    font-family:"IBM Plex Mono", monospace; font-size:12px; letter-spacing:.06em;
+    text-transform:uppercase; color:var(--accent-ink); margin-bottom:10px;
+  }
+  h1.title{font-size:clamp(28px,5vw,38px); font-weight:700; line-height:1.15}
+  .subtitle{color:var(--ink-muted); font-size:16px; margin-top:10px; max-width:56ch}
+
+  .statrow{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+    gap:1px; background:var(--line);
+    border:1px solid var(--line); border-radius:12px; overflow:hidden;
+    margin-top:22px;
+  }
+  .stat{background:var(--surface); padding:14px 16px}
+  .stat .num{font-family:"IBM Plex Mono",monospace; font-size:20px; font-weight:600; color:var(--accent-ink)}
+  .stat .lbl{font-size:12px; color:var(--ink-muted); margin-top:2px}
+
+  section{padding-block:34px}
+  section + section{border-top:1px solid var(--line)}
+  .section-head{margin-bottom:22px}
+  .section-kicker{font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--accent-ink); text-transform:uppercase; letter-spacing:.06em}
+  h2.section-title{font-size:26px; margin-top:6px}
+  .section-desc{color:var(--ink-muted); margin-top:8px; max-width:60ch}
+
+  /* ---- timeline ---- */
+  .timeline{position:relative; padding-left:34px}
+  .timeline::before{
+    content:""; position:absolute; left:11px; top:6px; bottom:6px; width:2px;
+    background:var(--line);
+  }
+  .tl-item{position:relative; padding-bottom:30px}
+  .tl-item:last-child{padding-bottom:0}
+  .tl-dot{
+    position:absolute; left:-34px; top:2px; width:24px; height:24px;
+    border-radius:50%; background:var(--surface); border:2px solid var(--accent);
+    display:flex; align-items:center; justify-content:center;
+    font-family:"IBM Plex Mono",monospace; font-size:11px; font-weight:600; color:var(--accent-ink);
+  }
+  .tl-title{font-weight:600; font-size:17px}
+  .tl-time{font-family:"IBM Plex Mono",monospace; font-size:11px; color:var(--ink-muted); margin-left:8px; font-weight:400}
+  .tl-body{margin-top:8px; color:var(--ink)}
+  .tl-body p{margin:0 0 10px}
+  .analogy{
+    background:var(--surface-2); border-radius:10px; padding:12px 14px;
+    font-size:14.5px; margin:10px 0;
+  }
+  .analogy b{color:var(--accent-ink)}
+
+  .ps{
+    border:1px dashed var(--accent-2); background:var(--accent-2-bg);
+    border-radius:10px; padding:12px 14px; margin:12px 0; font-size:14px;
+  }
+  .ps-tag{
+    font-family:"IBM Plex Mono",monospace; font-weight:600; font-size:11px;
+    color:var(--accent-2); text-transform:uppercase; letter-spacing:.05em;
+    display:block; margin-bottom:5px;
+  }
+
+  code, .code-inline{
+    font-family:"IBM Plex Mono",monospace; font-size:.88em;
+    background:var(--surface-2); padding:1px 6px; border-radius:5px;
+  }
+  pre{
+    background:var(--code-bg); color:var(--code-ink);
+    border-radius:10px; padding:14px 16px; overflow-x:auto;
+    font-family:"IBM Plex Mono",monospace; font-size:12.5px; line-height:1.6;
+    margin:10px 0;
+  }
+  pre code{background:none; padding:0; color:inherit}
+  .cmt{color:var(--code-muted)}
+
+  .tag{
+    display:inline-block; font-family:"IBM Plex Mono",monospace; font-size:11px;
+    padding:2px 9px; border-radius:999px; font-weight:600; margin-right:6px;
+  }
+  .tag.good{background:var(--good-bg); color:var(--good)}
+  .tag.bad{background:var(--bad-bg); color:var(--bad)}
+
+  /* ---- score table ---- */
+  .scoretable-wrap{overflow-x:auto; margin:14px 0}
+  table.score{border-collapse:collapse; width:100%; font-size:13.5px; min-width:520px}
+  table.score th, table.score td{
+    border:1px solid var(--line); padding:8px 10px; text-align:center;
+  }
+  table.score th{background:var(--surface-2); font-family:"IBM Plex Mono",monospace; font-weight:600; font-size:12px}
+  table.score td:first-child, table.score th:first-child{text-align:left}
+  table.score td.num{font-family:"IBM Plex Mono",monospace}
+
+  /* ---- BQ cards ---- */
+  .bq-card{
+    background:var(--surface); border:1px solid var(--line); border-radius:14px;
+    padding:22px 24px; box-shadow:var(--shadow); margin-bottom:24px;
+  }
+  .bq-prompt{
+    font-style:italic; color:var(--ink-muted); font-size:14.5px;
+    border-left:3px solid var(--accent); padding-left:14px; margin-bottom:16px;
+  }
+  .bq-label{
+    font-family:"IBM Plex Mono",monospace; font-weight:600; font-size:11px;
+    color:var(--accent-ink); text-transform:uppercase; letter-spacing:.06em;
+    margin:16px 0 6px;
+  }
+  .bq-label:first-of-type{margin-top:0}
+  .bq-card p{margin:0 0 8px}
+
+  footer{padding-block:30px 50px; color:var(--ink-muted); font-size:13px; text-align:center}
+
+  @media (max-width:520px){
+    .topbar-title{font-size:13px}
+    h1.title{font-size:26px}
+    .timeline{padding-left:28px}
+    .tl-dot{left:-28px; width:20px; height:20px; font-size:10px}
+    .bq-card{padding:18px}
+  }
+</style>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <span class="topbar-title mono">🧭 点餐助手 · 开发日志</span>
+    <nav class="navpills">
+      <a href="#part1">Part 1 · 开发流程</a>
+      <a href="#part2">Part 2 · BQ 复盘</a>
+    </nav>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <header class="hero">
+    <div class="eyebrow">Session Log · 2026-09-16 → 09-17</div>
+    <h1 class="title">给外卖平台加一个会聊天的点餐助手</h1>
+    <p class="subtitle">从"看现有代码"到"生产环境跑起来"的完整过程：RAG 检索、GPT 结构化推荐、前端聊天气泡，以及一路上踩过的坑。</p>
+
+    <div class="statrow">
+      <div class="stat"><div class="num">3 / 3</div><div class="lbl">阶段全部完成</div></div>
+      <div class="stat"><div class="num">49</div><div class="lbl">改动文件数</div></div>
+      <div class="stat"><div class="num">+1786</div><div class="lbl">新增代码行</div></div>
+      <div class="stat"><div class="num">3</div><div class="lbl">轮打分迭代</div></div>
+      <div class="stat"><div class="num">4</div><div class="lbl">修复的明显 bug</div></div>
+    </div>
+  </header>
+
+  <section id="part1">
+    <div class="section-head">
+      <div class="section-kicker">Part 1</div>
+      <h2 class="section-title">开发流程：先干什么、为什么、再干什么</h2>
+      <p class="section-desc">按真实的时间顺序记录。每一步都在回答同一个问题：<b>这一步不做，下一步会出什么问题？</b></p>
+    </div>
+
+    <div class="timeline">
+
+      <div class="tl-item">
+        <div class="tl-dot">01</div>
+        <div class="tl-title">先看现有代码，不写一行集成代码 <span class="tl-time">起点</span></div>
+        <div class="tl-body">
+          <p>需求是：用户说"想吃辣的，预算30以内"，AI 理解 → 语义检索菜品 → GPT 生成推荐 → 前端一键加购物车。但项目已经有一整套点餐系统在跑，红线是"不能重写购物车、不能碰 payment"。所以第一步不是写代码，是先读懂三样东西：菜品表结构、购物车 API 长什么样、前端怎么调后端。</p>
+          <div class="analogy">🧩 类比：这就像接手一个正在装修的房子去加一个房间——不先看承重墙在哪，直接砸墙大概率会把水管砸破。</div>
+          <p>看完发现三个决定后面方案的关键事实：菜品表<b>没有"分类"字段</b>；购物车加购是 <code>POST /cart</code>，前端用的是原生 <code>fetch</code> 不是 axios；后端是 <b>Spring Data JDBC</b>，不是 Hibernate/JPA。</p>
+          <div class="ps">
+            <span class="ps-tag">PS · Spring Data JDBC vs JPA</span>
+            JPA/Hibernate 会帮你把数据库里几乎任何类型自动"翻译"成 Java 对象，包括后面要用到的 <code>vector</code> 向量类型（社区有现成的适配库）。Spring Data JDBC 更"薄"——它只做最基础的表↔对象映射，遇到 <code>vector</code> 这种数据库扩展类型就不认识了。这意味着这个项目不能照抄网上大多数"Spring Boot + pgvector"教程，得自己写一层原生 SQL 来处理向量。
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot">02</div>
+        <div class="tl-title">决定用 pgvector 做语义检索，而不是专门的向量数据库</div>
+        <div class="tl-body">
+          <p>方案是 RAG（检索增强生成）：把每道菜的"名字+描述"提前转换成一串数字（向量），存起来；用户提问时把问题也转成向量，在数据库里找"数字最接近"的菜。</p>
+          <div class="analogy">🗺️ 类比：把每道菜想象成地图上的一个点。"辣的川菜"和"香辣牛肉"这两句话生成的点离得很近，"冰淇淋"生成的点离得很远。检索就是找"离用户这句话最近的几个点"。</div>
+          <div class="ps">
+            <span class="ps-tag">PS · 为什么是 pgvector，不是 Pinecone/Milvus</span>
+            这些是专门的向量数据库，适合几十万条以上、需要独立扩缩容的场景。这个项目只有 100 多道菜，数据本来就在 Postgres 里——用 pgvector（给 Postgres 装一个扩展，让它多认识一种 <code>vector</code> 列类型）可以让"查价格"和"查语义"在<b>同一条 SQL</b> 里完成，不用维护两套数据库的一致性。规模不够大时，专门的向量数据库是过度设计。
+          </div>
+          <p>这一步只是<b>决定</b>方案，还没动手——因为要换 pgvector，本地和线上的 Postgres 镜像都得换，这是数据库基础设施改动，得先跟需求方（这里是我自己）对齐。</p>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot">03</div>
+        <div class="tl-title">换 Postgres 镜像：本地五分钟，生产环境两小时</div>
+        <div class="tl-body">
+          <p>本地只是把 <code>docker-compose.yml</code> 里的镜像从 <code class="mono">postgres:15-alpine</code> 换成 <code class="mono">pgvector/pgvector:pg15</code>，重建容器，完事。</p>
+          <p>生产环境（AWS ECS）完全是另一回事——这是这次开发里<b>耗时最长、最像真实运维事故排查</b>的一段，详细复盘放在 Part 2 的 BQ 故事里，这里只列关键动作：</p>
+          <ul>
+            <li>确认生产数据库其实是 ECS 上跑的一个容器（不是 RDS），单台 EC2 实例，数据用 <b>bind mount</b> 存在宿主机本地目录</li>
+            <li>确认换镜像后 arm64 架构兼容（<code class="mono">docker manifest inspect</code> 确认 pgvector 官方镜像支持 arm64）</li>
+            <li>换镜像后连续遇到"内存不够"→"端口冲突"→"可用区重平衡配置冲突"三个部署失败，逐层排查</li>
+            <li>最终用 AWS CLI 一条命令把部署策略从"新旧任务同时存在"改成"先停旧、再起新"，问题解决</li>
+          </ul>
+          <div class="ps">
+            <span class="ps-tag">PS · Docker Bind Mount</span>
+            容器里的数据默认是"一次性"的——容器删了数据就没了。Bind mount 是把宿主机（EC2 实例）上的一个真实文件夹，"挂载"进容器内部的某个路径，这样容器读写的其实是宿主机磁盘上的文件，容器可以随便重建，数据留在宿主机上。代价是：如果调度系统把新容器放到了<b>另一台</b>机器上，这个文件夹就找不到了——这也是当时要先确认"只有一台 EC2 实例"的原因。
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot">04</div>
+        <div class="tl-title">阶段1：后端 RAG 检索</div>
+        <div class="tl-body">
+          <p>加一列 <code class="mono">embedding vector(1536)</code> 到菜品表，写一个 <code class="mono">MenuItemEmbeddingRepository</code>——它不走 Spring Data JDBC 那套自动映射，直接用 <code class="mono">JdbcTemplate</code> 手写 SQL，配合 pgvector 官方 Java 客户端读写向量列。</p>
+          <pre><span class="cmt">-- 检索的核心 SQL，就是"按向量距离排序取前 N 个"</span>
+SELECT id, name, price, embedding &lt;=&gt; ? AS distance
+FROM menu_items
+ORDER BY distance
+LIMIT ?</pre>
+          <div class="ps">
+            <span class="ps-tag">PS · <code class="mono">&lt;=&gt;</code> 是什么</span>
+            这是 pgvector 装扩展后新增的"余弦距离"运算符，专门用来比较两个向量的夹角有多接近——数值越小，两句话/两道菜的语义越像。它不是 SQL 标准语法，是扩展带来的"新词汇"。
+          </div>
+          <p>菜品的向量什么时候算、谁来算，是个成本控制问题：<b>只在菜品新增/修改时算一次存库</b>，绝不在用户每次提问时重新计算全部菜品的向量。种子数据是靠原始 SQL <code>INSERT</code> 灌进去的，不经过代码逻辑，所以专门写了一个 <code class="mono">MenuItemEmbeddingBackfillRunner</code>，应用启动时批量给漏掉的菜品补上向量（一次 API 调用最多传 2048 条文本，不是循环调 100 次）。</p>
+          <p><b>验收结果</b>："想吃辣的""咖啡" 这类查询检索得很准；"汉堡"这种具体品类词效果差——检索出的候选里真正的汉堡占比很低。原因：菜品描述全是英文，中文短词（尤其具体名词）在跨语言的向量空间里对齐得不够紧，这是当前 embedding 模型的真实局限，不是代码 bug。</p>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot">05</div>
+        <div class="tl-title">阶段2：GPT 结构化推荐</div>
+        <div class="tl-body">
+          <p>光有检索还不够——把检索出的候选喂给 GPT，让它写推荐语和理由。关键设计：<b>强制 GPT 按指定 JSON 结构回复</b>，而不是让它自由发挥写一段话再指望前端用正则去解析。</p>
+          <div class="ps">
+            <span class="ps-tag">PS · JSON Schema Strict Mode</span>
+            正常情况下大模型的输出是不受约束的自然语言，格式随缘。OpenAI 的 <code class="mono">response_format: json_schema</code> + <code class="mono">strict: true</code> 相当于给模型一张"填空表格"，规定死每个字段的名字和类型，模型必须照着填，多一个字段少一个字段都不行。这样后端拿到的永远是能直接解析的结构化数据，不用猜。
+          </div>
+          <p>另一个关键设计：GPT 只被允许从"检索候选清单"里选，<b>不能凭空生成一个菜品 ID</b>。就算它输出的 ID 不在候选清单里，后端也会在拼装最终结果时把它过滤掉——双重保险。菜名、价格、图片也不是让 GPT 生成的，是后端拿检索到的真实数据回填的，GPT 只负责写"为什么推荐"这句话，减少它编造数据的空间。</p>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot">06</div>
+        <div class="tl-title">阶段3：前端聊天气泡</div>
+        <div class="tl-body">
+          <p>右下角悬浮按钮 + 弹出面板，参考 Amazon/Intercom 那种客服小组件的形态。技术上没有新东西——最重要的一个决定是<b>加购物车按钮直接复用了已有的 <code class="mono">AddToCartButton</code> 组件</b>，一行代码没有重写购物车逻辑。</p>
+          <div class="analogy">🔌 类比：这就像给新装的智能音箱接上家里已有的插座，而不是重新拉一条电线。</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot">07</div>
+        <div class="tl-title">打分表迭代：把"测试 AI 功能"变成可量化的事</div>
+        <div class="tl-body">
+          <p>AI 功能没法像普通接口那样断言"返回值必须等于 X"，所以自己定了一套打分维度，跑一组覆盖正常+边界场景的 query，人工打分，找最低项和明显 bug，改完重测，重复到没有明显 bug。这个过程详细复盘在 Part 2。</p>
+          <div class="scoretable-wrap">
+            <table class="score">
+              <tr><th>维度</th><th>第一轮</th><th>第二轮</th><th>第三轮</th></tr>
+              <tr><td>相关性</td><td class="num">3.4</td><td class="num">4.5</td><td class="num">4.7</td></tr>
+              <tr><td>真实性（不编造）</td><td class="num">3.3</td><td class="num">4.7</td><td class="num">4.6</td></tr>
+              <tr><td>健壮性（边界情况）</td><td class="num">2.0</td><td class="num">3.5</td><td class="num">4.5</td></tr>
+              <tr><td>速度</td><td class="num">&lt;3.5s</td><td class="num">&lt;2.6s</td><td class="num">&lt;2.9s</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot">08</div>
+        <div class="tl-title">收尾：敏感信息检查 + 提交</div>
+        <div class="tl-body">
+          <p>Push 前先扫一遍要提交的内容：<code class="mono">grep</code> 全部改动文件找 <code class="mono">sk-</code>、<code class="mono">password</code> 这类特征串，确认真实 API key 所在的 <code class="mono">config/application.yaml</code> 被 <code class="mono">.gitignore</code> 正确排除，顺手把浏览器自动化工具留下的调试日志目录也加进忽略规则。确认干净之后才 <code class="mono">commit</code> + <code class="mono">push</code>。</p>
+          <div class="ps">
+            <span class="ps-tag">PS · 为什么本地密钥用一个额外的 <code class="mono">config/</code> 目录，不用 shell 环境变量</span>
+            Spring Boot 启动时会自动去项目根目录下的 <code class="mono">config/application.yaml</code>（如果存在）找配置，优先级比打包进 jar 里的默认配置高。这个文件被加进了 <code class="mono">.gitignore</code>，本地随便写真实 key 都不会被提交。比起在终端里 <code class="mono">export</code> 环境变量，它不挑 shell（bash/zsh/fish 语法不一样），也不会因为敲错一个空格就把 key 值搞错。
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="part2">
+    <div class="section-head">
+      <div class="section-kicker">Part 2</div>
+      <h2 class="section-title">模拟 BQ：讲一个挑战和你怎么解决的</h2>
+      <p class="section-desc">面试常被问到"Describe a challenge and how you overcame it"。这里整理了两个真实发生的故事，分别对应"排查生产环境问题"和"定位一个隐蔽的代码 bug"两类常见考察方向，按 <b>Situation / Task / Action / Result</b> 整理，可以直接照着讲。</p>
+    </div>
+
+    <div class="bq-card">
+      <div class="bq-prompt">"Tell me about a time you had to debug a production infrastructure issue under uncertainty."</div>
+
+      <div class="bq-label">Situation</div>
+      <p>要给生产数据库换成支持向量检索的 Postgres 镜像。项目部署在 AWS ECS 上，我一开始并不知道数据库到底是托管服务还是自建容器，也不知道背后是几台机器、数据怎么持久化的——这些信息控制台里要一层一层点进去才能确认。</p>
+
+      <div class="bq-label">Task</div>
+      <p>在不确定基础设施拓扑的情况下，安全地把 Postgres 镜像换掉，同时不能丢数据、不能让线上服务长时间不可用。</p>
+
+      <div class="bq-label">Action</div>
+      <p>没有直接动手改，先系统性地确认了几件事：这是 ECS 上的容器还是 RDS；有几台 EC2 实例；数据靠什么机制持久化（发现是 bind mount 到宿主机本地目录）；当前的部署配置默认值是什么。确认"只有一台实例、bind mount 到本地"之后，才判断出换镜像本身风险可控，不需要走复杂的备份迁移流程。</p>
+      <p>换镜像后部署接连失败，每次报错都不一样：先是"内存不够"——查出是滚动部署要求新旧任务短暂同时存在，需要双倍内存，而这台 <code class="mono">t4g.micro</code> 实例只有 1GB；调整内存配置后又变成"端口冲突"——发现是静态端口映射导致新旧任务不能共存；最后定位到根本问题是部署策略本身要求"先起新的再停旧的"，跟这台单实例、内存紧张的机器天然不兼容。改成"先停旧、再起新"的策略后，配合另一个隐藏的"可用区重平衡"配置冲突（这个功能要求预留额外容量，跟单实例场景冲突），才最终解决。</p>
+      <p>过程中控制台的新版 UI 把关键的部署配置项藏得很深，找了很久没找到，最后果断切到 AWS CLI，一条命令把问题解决——工具用得不顺手的时候，及时换一个更直接的路径，比死磕一个 UI 更有效率。</p>
+
+      <div class="bq-label">Result</div>
+      <p>镜像换成功，语义检索功能的数据库前提就绪，零数据丢失。顺带发现并记录了这台实例长期存在的部署配置隐患（内存冗余不足），为后续迭代提前排了雷。</p>
+
+      <div class="bq-label">What I'd do differently</div>
+      <p>如果这是一个更大的团队/项目，会在做任何基础设施改动前先建一份"当前生产拓扑"的文档，而不是每次出问题都现场一层层排查——这次花的两个多小时，很大一部分时间成本是在"搞清楚现状"而不是"解决问题"本身。</p>
+    </div>
+
+    <div class="bq-card">
+      <div class="bq-prompt">"Describe a subtle bug you found and how you tracked it down."</div>
+
+      <div class="bq-label">Situation</div>
+      <p>GPT 推荐接口跑起来后，返回的 <code class="mono">summary</code> 文字会说"我推荐了几道辣味菜品"，描述得有名有姓，但结构化的 <code class="mono">recommendations</code> 数组永远是空的——不管换什么样的 query，现象完全一致。</p>
+
+      <div class="bq-label">Task</div>
+      <p>找到为什么"模型说它推荐了东西"和"结构化字段里什么都没有"这两者对不上。</p>
+
+      <div class="bq-label">Action</div>
+      <p>先排除了最容易怀疑的地方：GPT 有没有真的推荐了东西——从 <code class="mono">summary</code> 的措辞看，它显然是"知道"该推荐哪些菜的，问题不在检索或者 prompt 上。于是往下追：既然模型"知道"，为什么结构化字段是空的？后端有一段防护逻辑，会把模型返回的菜品 ID 拿去跟检索候选列表核对，核对不上的会被过滤掉——如果这段逻辑把<b>所有</b>结果都过滤掉了，那大概率是 ID 匹配失败，而不是模型真的没输出 ID。</p>
+      <p>顺着这个方向看序列化配置：项目为了让自己的 REST 接口输出蛇形命名（<code class="mono">menu_item_id</code>），在全局配置了 Jackson 的命名策略。而解析 GPT 返回结果用的正好是这个全局共享的 <code class="mono">ObjectMapper</code>——但我们发给 GPT 的 JSON Schema 里字段名写的是驼峰 <code class="mono">menuItemId</code>（跟 Java 字段名对应）。也就是说：解析器在按蛇形命名去找字段，而 JSON 里实际的 key 是驼峰命名，永远对不上，字段被解析成 <code class="mono">null</code>，过滤逻辑理所当然地把"ID 为空"的结果全部丢弃。</p>
+
+      <div class="bq-label">Result</div>
+      <p>把这段解析逻辑换成一个独立的、不带任何命名策略的 <code class="mono">ObjectMapper</code>——因为"跟前端约定的 REST 契约"和"跟 GPT 约定的结构化输出契约"其实是两套完全独立的 JSON 规则，不该共用同一份全局配置。改完之后推荐结果立刻正常返回。</p>
+      <p>这个案例后来也写进了自己的经验教训清单：<b>共享的序列化配置只应该服务于它本来的那个契约</b>，复用给另一个场景，表面上"看起来都是 JSON"，实际命名约定可能完全不兼容，而且这种 bug 不会报错、不会崩溃，只会安静地把数据丢空——比抛异常的 bug 更难发现。</p>
+    </div>
+
+  </section>
+
+  <footer>点餐助手 · AI 推荐功能开发日志 — 本地静态页面，可直接双击打开查看</footer>
+</div>

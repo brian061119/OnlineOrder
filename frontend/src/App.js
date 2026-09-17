@@ -50,7 +50,7 @@ function App() {
       >
         {authed ? (
           isAdmin ? (
-            <Tabs defaultActiveKey="order">
+            <Tabs className="section-tabs" defaultActiveKey="order">
               <TabPane tab="Order" key="order">
                 <FoodList />
               </TabPane>

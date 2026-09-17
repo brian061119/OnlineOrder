@@ -59,6 +59,9 @@ const MenuList = ({ restaurant, onBack }) => {
                     alt={item.name}
                     className="dish-card-img"
                   />
+                  <div className="dish-card-media-fab">
+                    <AddToCartButton itemId={item.id} />
+                  </div>
                 </div>
               }
             >
@@ -71,9 +74,6 @@ const MenuList = ({ restaurant, onBack }) => {
               {item.description && (
                 <p className="dish-desc">{item.description}</p>
               )}
-              <div className="dish-card-footer">
-                <AddToCartButton itemId={item.id} />
-              </div>
             </Card>
           </List.Item>
         )}

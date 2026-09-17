@@ -96,6 +96,52 @@
   right: -50px;
 }
 
+/* faded burger + fries watermark filling the login background, kept subtle
+   so the username/password fields stay easy to read */
+.login-page-deco {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.deco-burger,
+.deco-fries {
+  position: absolute;
+  color: var(--moo-caramel);
+  opacity: 0.1;
+}
+
+.deco-burger {
+  width: min(60vw, 620px);
+  height: auto;
+  top: -8%;
+  right: -10%;
+  transform: rotate(-6deg);
+}
+
+.deco-fries {
+  width: min(30vw, 320px);
+  height: auto;
+  bottom: -6%;
+  left: -4%;
+  transform: rotate(8deg);
+}
+
+@media (max-width: 640px) {
+  .deco-burger {
+    width: 80vw;
+    top: -6%;
+    right: -20%;
+  }
+  .deco-fries {
+    width: 46vw;
+    bottom: -4%;
+    left: -10%;
+  }
+}
+
 .login-card {
   position: relative;
   z-index: 1;
@@ -161,6 +207,17 @@
 
 .login-card .anticon {
   color: var(--moo-text-muted);
+}
+
+/* hide the browser's own password reveal/autofill icons so they don't
+   visually collide with AntD's custom eye icon (looked like a stray black box) */
+.login-card input[type="password"]::-webkit-textfield-decoration-container,
+.login-card input[type="password"]::-webkit-credentials-auto-fill-button,
+.login-card input[type="password"]::-webkit-caps-lock-indicator,
+.login-card input[type="password"]::-webkit-strong-password-auto-fill-button {
+  display: none !important;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .login-card .ant-form-item-explain-error {
@@ -244,6 +301,30 @@
   font-weight: 700;
   color: var(--moo-choco);
   margin-bottom: 18px;
+}
+
+.restaurant-search {
+  max-width: 420px;
+  margin-bottom: 22px;
+}
+
+.restaurant-search.ant-input-affix-wrapper {
+  border-radius: 999px;
+  border: 1px solid var(--moo-border);
+  background: var(--moo-card-bg);
+  padding: 8px 18px;
+  box-shadow: var(--moo-shadow-sm);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.restaurant-search.ant-input-affix-wrapper:hover,
+.restaurant-search.ant-input-affix-wrapper-focused {
+  border-color: var(--moo-caramel);
+  box-shadow: var(--moo-shadow-md);
+}
+
+.restaurant-search .anticon {
+  color: var(--moo-text-muted);
 }
 
 .restaurant-list .ant-list-item {
@@ -421,9 +502,18 @@
 }
 
 .dish-card-media {
+  position: relative;
   aspect-ratio: 4 / 3;
   overflow: hidden;
   background: var(--moo-cream-deep);
+}
+
+.dish-card-media-fab {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 2;
+  filter: drop-shadow(0 4px 10px rgba(91, 58, 41, 0.3));
 }
 
 .dish-card-img {
@@ -474,11 +564,6 @@
   overflow: hidden;
 }
 
-.dish-card-footer {
-  display: flex;
-  justify-content: flex-end;
-}
-
 .add-to-cart-btn {
   border-radius: 999px !important;
   background: var(--moo-caramel) !important;
@@ -518,6 +603,95 @@
 .quantity-menu .ant-dropdown-menu-item:hover {
   background: var(--moo-cream-deep);
   color: var(--moo-caramel-dark);
+}
+
+/* ---------- Order / Admin section tabs, styled as pressable buttons ---------- */
+.section-tabs .ant-tabs-nav::before {
+  border-bottom: none;
+}
+
+.section-tabs .ant-tabs-nav-list {
+  gap: 10px;
+}
+
+.section-tabs .ant-tabs-tab {
+  margin: 0 !important;
+  padding: 10px 22px !important;
+  background: var(--moo-card-bg);
+  border: 1px solid var(--moo-border) !important;
+  border-radius: 999px !important;
+  box-shadow: var(--moo-shadow-sm);
+  transition: transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.16s ease,
+    border-color 0.16s ease, background-color 0.16s ease;
+}
+
+.section-tabs .ant-tabs-tab .ant-tabs-tab-btn {
+  color: var(--moo-text-muted);
+  font-weight: 600;
+}
+
+.section-tabs .ant-tabs-tab:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--moo-shadow-md);
+  border-color: var(--moo-caramel-light) !important;
+}
+
+.section-tabs .ant-tabs-tab:hover .ant-tabs-tab-btn {
+  color: var(--moo-caramel-dark);
+}
+
+.section-tabs .ant-tabs-tab:active {
+  transform: scale(0.94);
+}
+
+.section-tabs .ant-tabs-tab-active {
+  background: var(--moo-caramel) !important;
+  border-color: var(--moo-caramel) !important;
+  box-shadow: var(--moo-shadow-md);
+}
+
+.section-tabs .ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: #fff !important;
+}
+
+.section-tabs .ant-tabs-tab-active:hover {
+  transform: translateY(-2px) scale(1.02);
+}
+
+.section-tabs .ant-tabs-ink-bar {
+  display: none;
+}
+
+/* ---------- Sitewide primary button + modal theming ---------- */
+.ant-btn-primary {
+  background: var(--moo-caramel);
+  border-color: var(--moo-caramel);
+  transition: transform 0.16s ease, box-shadow 0.16s ease, background-color 0.16s ease,
+    border-color 0.16s ease;
+}
+
+.ant-btn-primary:hover,
+.ant-btn-primary:focus {
+  background: var(--moo-caramel-dark);
+  border-color: var(--moo-caramel-dark);
+}
+
+.ant-modal-content {
+  border-radius: var(--moo-radius-md);
+  overflow: hidden;
+}
+
+.ant-modal-header {
+  border-bottom: 1px solid var(--moo-border);
+}
+
+.ant-modal-title {
+  color: var(--moo-choco);
+  font-weight: 700;
+}
+
+.ant-modal-footer {
+  border-top: 1px solid var(--moo-border);
 }
 
 /* ---------- Global toast polish ---------- */
