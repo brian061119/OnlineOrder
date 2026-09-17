@@ -13,9 +13,9 @@ import AddToCartButton from "./AddToCartButton";
 const { Text, Paragraph } = Typography;
 
 const WELCOME_TEXT =
-  "你好，我是点餐助手。告诉我你想吃什么（比如“想吃辣的，预算30以内”），我来帮你推荐。";
+  "Hi, I'm your ordering assistant. Tell me what you're in the mood for (e.g. \"something spicy, under $30\") and I'll recommend a few dishes.";
 
-// 每条消息: { role: "user" | "assistant", text?, recommendations?, disclaimer? }
+// each message: { role: "user" | "assistant", text?, recommendations?, disclaimer? }
 const AiChatWidget = () => {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([]);
@@ -55,7 +55,10 @@ const AiChatWidget = () => {
         message.error(err.message);
         setMessages((prev) => [
           ...prev,
-          { role: "assistant", text: "抱歉，暂时无法生成推荐，请稍后再试。" },
+          {
+            role: "assistant",
+            text: "Sorry, I couldn't generate a recommendation right now. Please try again shortly.",
+          },
         ]);
       })
       .finally(() => {
@@ -86,7 +89,7 @@ const AiChatWidget = () => {
           <div className="ai-chat-header">
             <RobotOutlined style={{ marginRight: 8 }} />
             <Text strong style={{ color: "#fff" }}>
-              AI 点餐助手
+              AI Ordering Assistant
             </Text>
           </div>
 
@@ -119,7 +122,7 @@ const AiChatWidget = () => {
 
                   {m.recommendations && m.recommendations.length === 0 && (
                     <Empty
-                      description="没有找到合适的推荐"
+                      description="No matching recommendations found"
                       image={Empty.PRESENTED_IMAGE_SIMPLE}
                     />
                   )}
@@ -171,7 +174,7 @@ const AiChatWidget = () => {
                   className="ai-chat-avatar"
                 />
                 <div className="ai-chat-bubble-content">
-                  <Spin size="small" /> 正在生成推荐...
+                  <Spin size="small" /> Generating recommendations...
                 </div>
               </div>
             )}
@@ -179,7 +182,7 @@ const AiChatWidget = () => {
 
           <div className="ai-chat-footer">
             <Input
-              placeholder="想吃什么？说说你的需求..."
+              placeholder="What are you in the mood for?"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={onKeyDown}

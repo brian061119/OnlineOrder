@@ -33,7 +33,7 @@ public class AiSearchService {
 
     public List<MenuItemSearchResultDto> search(String query, int limit) {
         if (query == null || query.isBlank()) {
-            throw new IllegalArgumentException("请输入搜索内容");
+            throw new IllegalArgumentException("Please enter something to search for");
         }
 
         float[] queryEmbedding = embeddingService.embed(query);

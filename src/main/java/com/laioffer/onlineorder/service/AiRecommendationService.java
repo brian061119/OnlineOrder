@@ -17,21 +17,29 @@ public class AiRecommendationService {
 
 
     private static final int CANDIDATE_LIMIT = 10;
-    private static final String DISCLAIMER = "以上为参考推荐,如有过敏或忌口请自行确认菜品成分。";
+    private static final String DISCLAIMER =
+            "These are suggestions only — please double-check ingredients yourself if you have allergies or dietary restrictions.";
 
 
     private static final String SYSTEM_PROMPT = """
-            你是一个点餐助手。你只能从用户消息里提供的候选菜品列表中挑选推荐，
-            禁止推荐清单之外的任何菜品，禁止编造不存在的 menuItemId。
-            写推荐理由时只能依据候选菜品给出的名称和描述，禁止编造描述中没有出现的口味、做法或成分。
-            如果某道候选菜品的实际类别跟用户要求的品类不完全一致（比如用户要汉堡，候选里其实是三明治），
-            必须如实说明它的真实类别，不能为了迎合用户而把它错误地称作用户要的品类。
-            如果用户的消息本身完全跟点餐、菜品推荐无关（比如闲聊、写诗等无意义内容），
-            不要勉强从候选菜品里凑推荐，recommendations 返回空数组，并在 summary 里说明你只能帮忙推荐菜品。
-            但如果用户确实是在提食物类需求，只是候选菜品里没有完全对应的选项（比如要披萨但菜单没有），
-            不要返回空数组——诚实说明没有完全匹配的选项，并从候选里挑选相对合适的替代菜品推荐。
-            结合用户的需求（口味、预算等）挑选最合适的 1 到 5 个菜品，
-            用简体中文写一段简短的总体推荐语（summary），并为每个推荐的菜品写一句推荐理由（reason）。
+            You are a food ordering assistant. You may only recommend items from the candidate
+            menu list provided in the user message — never recommend anything outside that list,
+            and never invent a menuItemId that isn't in it.
+            When writing a reason, base it only on the name and description given for that candidate;
+            never invent flavors, ingredients, or preparation details that aren't in the description.
+            If a candidate's actual category doesn't fully match what the user asked for (e.g. the user
+            wants a burger but the candidate is actually a sandwich), state its real category honestly
+            instead of mislabeling it just to please the user.
+            If the user's message is entirely unrelated to ordering food or getting menu recommendations
+            (e.g. small talk, writing a poem, nonsense), don't force a recommendation out of the
+            candidates — return an empty recommendations array and explain in summary that you can only
+            help with menu recommendations.
+            But if the user is genuinely asking for a type of food and the candidates just don't have an
+            exact match (e.g. they want pizza but it's not on the menu), don't return an empty array —
+            say so honestly and pick the closest reasonable alternatives from the candidates instead.
+            Otherwise, pick the 1 to 5 best-fitting items based on the user's needs (taste, budget, etc.),
+            write a short overall recommendation (summary) in English, and a one-sentence reason for
+            each recommended item, also in English.
             """;
 
 
@@ -70,17 +78,17 @@ public class AiRecommendationService {
 
     public AiRecommendationDto recommend(String userMessage) {
         if (userMessage == null || userMessage.isBlank()) {
-            throw new IllegalArgumentException("请输入你的点餐需求");
+            throw new IllegalArgumentException("Please tell us what you'd like to order");
         }
 
         List<MenuItemSearchResultDto> candidates = aiSearchService.search(userMessage, CANDIDATE_LIMIT);
 
         String candidateText = candidates.stream()
-                .map(item -> "ID:%d 名称:%s 价格:%.2f 描述:%s".formatted(
+                .map(item -> "ID:%d Name:%s Price:%.2f Description:%s".formatted(
                         item.id(), item.name(), item.price(), item.description()))
                 .collect(Collectors.joining("\n"));
 
-        String userPrompt = "候选菜品列表：\n" + candidateText + "\n\n用户需求：" + userMessage;
+        String userPrompt = "Candidate menu items:\n" + candidateText + "\n\nUser request: " + userMessage;
 
         ModelRecommendation modelResult = chatCompletionService.completeStructured(
                 SYSTEM_PROMPT, userPrompt, "menu_recommendation", RECOMMENDATION_SCHEMA, ModelRecommendation.class);

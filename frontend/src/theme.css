@@ -100,7 +100,10 @@
    so the username/password fields stay easy to read */
 .login-page-deco {
   position: absolute;
-  inset: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
@@ -110,7 +113,7 @@
 .deco-fries {
   position: absolute;
   color: var(--moo-caramel);
-  opacity: 0.1;
+  opacity: 0.22;
 }
 
 .deco-burger {
